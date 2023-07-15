@@ -48,11 +48,6 @@ public class Acesso {
 		}
 
 	}
-	
-	public Acesso(String placa, int horaEntrada, int minutoEntrada, int minutoSaida) {
-		entradaSaida = new LinkedList<Hora>();
-		this.placaCarro = placa;
-	}
 
 	public void setPlacaCarro(String placa) {
 		this.placaCarro = placa;
