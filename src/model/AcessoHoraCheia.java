@@ -4,8 +4,8 @@ import java.util.List;
 
 public class AcessoHoraCheia extends AcessoEspecial{
 
-	public AcessoHoraCheia(double taxa) {
-		super(taxa);
+	public AcessoHoraCheia(String taxa) {
+		super(Double.parseDouble(taxa));
 	}
 
 	public double calcularTotal(double valor) {

@@ -12,7 +12,7 @@ public class ValorAcesso {
 	private String diurno;
 	private String mensalista; 
 	
-	public void ValoresAcessos(String ValorMensalista, String ValorFracao, String ValorDiurno) throws DescricaoEmBrancoException, ValorAcessoInvalidoException {
+	public ValorAcesso(String ValorMensalista, String ValorFracao, String ValorDiurno, String THorCheia) throws DescricaoEmBrancoException, ValorAcessoInvalidoException {
 		
 		if (ValorMensalista.isEmpty()) {
 			throw new DescricaoEmBrancoException("Preço Mensalista não Informado");
@@ -21,18 +21,19 @@ public class ValorAcesso {
 		} else if (ValorDiurno.isEmpty()) {
 			throw new DescricaoEmBrancoException("Preço Diurna não Informado");
 		}
-		else if (Integer.valueOf(ValorMensalista) < 0) {
+		else if (Double.valueOf(ValorMensalista) < 0) {
 			throw new ValorAcessoInvalidoException("Valor mensalista Negativo");
 		}
-		else if (Integer.valueOf(ValorFracao) < 0) {
+		else if (Double.valueOf(ValorFracao) < 0) {
 			throw new ValorAcessoInvalidoException("Valor da Fração Negativa");
 		}
-		else if (Integer.valueOf(ValorDiurno) < 0) {
+		else if (Double.valueOf(ValorDiurno) < 0) {
 			throw new ValorAcessoInvalidoException("Valor do Diurno Negativo");
 		}
 		else{
 			valorEvento = new LinkedList<AcessoEvento>();
 			
+			valorHoraCheia = new AcessoHoraCheia(THorCheia);
 			this.mensalista = ValorMensalista;
 			this.fracao = ValorFracao; 
 			this.diurno = ValorDiurno;

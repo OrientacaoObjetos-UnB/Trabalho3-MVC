@@ -47,7 +47,7 @@ public class main {
 			limparPrompt();
 			System.out.println("==================================================\n   GERENCIADOR DE ACESSOS DE ESTACIONAMENTO:\n\n"
 					+ "Digite a Opção desejada:\n\n" + "(1) Visualizar Estacionamentos;\n(2) Criar um Estacionamento\n"
-					+ "(3) Criar um Acesso\n(4) Configurar Preços\n(5) Listar Eventos \n(6) Adicionar Evento \n\n================================================== \n\n");
+					+ "(3) Criar um Acesso\n(4) Listar Eventos \n(5) Adicionar Evento \n\n================================================== \n\n");
 			
 				System.out.println("Digite: ");
 				escolha = scanner.nextInt();
@@ -70,12 +70,9 @@ public class main {
 					escolha3(banco, bancoE);
 					break;
 				case 4:
-					escolha4(banco, bancoE);
-					break;
-				case 5:
 					escolhaListarEvento(banco, bancoE);
 					break;
-				case 6:
+				case 5:
 					escolha5(banco, bancoE);
 					
 				default:
@@ -111,7 +108,9 @@ public class main {
 					System.out.println("\n\n");
 					System.out.println("Nome do Estacionamento: " + e.getNome() + "\nCapacidade: " + e.getAcessos().size() + "/" + e.getCapacidade()
 					+ "\nPorcentagem de Retorno: " + e.getRetornoContratante() + "%\nHorário de Funcionamento: Das " +
-					e.getHorarioFuncionamento().get(0).getHoraMinuto() + " até " + e.getHorarioFuncionamento().get(1).getHoraMinuto());
+					e.getHorarioFuncionamento().get(0).getHoraMinuto() + " até " + e.getHorarioFuncionamento().get(1).getHoraMinuto() +
+					"\n\nPreço por Fração: R$" + e.getValores().getFracao() + "\nPreço Mensalista: R$" + e.getValores().getMensalista() + 
+					"\nPreço Diurno: R$" + e.getValores().getDiurno() + "\nTaxa de Desconto por Hora Cheia: " + e.getValores().getValorHoraCheia().getTaxaPorcentagem() + "%");
 					
 					System.out.println("\n\n LUCRO TOTAL: R$" +  e.calcularTotalContratante() + "\n\n\n==============="
 					+ "===================================");
@@ -234,9 +233,10 @@ public class main {
 			}
 			else {
 				for (Acesso v: banco.get(resposta -1).getAcessos()) {
-
-					System.out.println("\n\nPlaca do veículo: " + v.getPlacaCarro() + "\n\n");
-					System.out.println("==================================================");
+					
+					System.out.println("\n\nPlaca do veículo: " + v.getPlacaCarro() + "\n\n" + "Tempo de permanência: Das " + v.getEntradaSaida().get(0).getHoraMinuto() + 
+					" Até " + v.getEntradaSaida().get(1).getHoraMinuto());
+					System.out.println("\n==================================================");
 				}
 				
 				int resposta2 = 0;
@@ -498,10 +498,28 @@ public class main {
 						
 						hF = Integer.parseInt(horaString);  // Hora como int
 						mF = Integer.parseInt(minutoString);  // Minuto como int
+
+						
+						String ValorFix1 = "";
+						String ValorFix2 = "";
+						String ValorFix3 = "";
+						String taxa = "";
+						
+						System.out.println("\n\nQual o preço deste estacionamento do tipo Mensal?");
+						ValorFix1 = scanner.next();
+						
+						System.out.println("\n\nQual o preço deste estacionamento por fração de 15 minutos?");
+						ValorFix2 = scanner.next();
+						
+						System.out.println("\n\nQual o preço deste estacionamento do tipo Diurno?");
+						ValorFix3 = scanner.next();
+						
+						System.out.println("\n\nQual a taxa de desconto por Hora Completa? (Apenas Números)");
+						taxa = scanner.next();
 						
 						try {
 							Estacionamento criacao;
-							criacao = new Estacionamento(nome, capacidade, retorno, hI, mI, hF, mF);
+							criacao = new Estacionamento(nome, capacidade, retorno, hI, mI, hF, mF, ValorFix1, ValorFix2, ValorFix3, taxa);
 							banco.add(criacao);
 						} catch (ValorAcessoInvalidoException e) {
 							limparPrompt();
@@ -514,15 +532,15 @@ public class main {
 							aplicarDelay(5000);
 							limparPrompt();
 						}	
+						
 					}
 				}
-				
-				limparPrompt();
-				
-				System.out.println("Estacionamento Criado!");
-				aplicarDelay(2000);
-				limparPrompt();
-				System.out.println("==================================================\n Gostaria de criar outro"
+						limparPrompt();
+						
+						System.out.println("Estacionamento Criado!");
+						aplicarDelay(2000);
+						limparPrompt();
+						System.out.println("==================================================\n Gostaria de criar outro"
 						+ " estacionamento?\n\n Digite a opção desejada: \n\n(1) Sim; \n(2) Não"
 						+ "\n==================================================\n\nDigite: ");
 				escolha = scanner.nextInt();
@@ -602,8 +620,62 @@ public class main {
 				limparPrompt();
 				System.out.println("Insira a placa do Carro:\n");
 				placa = scanner.next();
+
+				// VARIÁVEIS PARA CONFIGURAÇÃO:
+				String hI = "0";
+				String mI = "0";
+				String hF = "0";
+				String mF = "0";
+				String horaCompleta = "";
 				
-				banco.get(resposta - 1).setAcessos(placa);
+				while(((Integer.parseInt(hI) < 0) || (Integer.parseInt(hI) > 23)) || ((Integer.parseInt(mI) < 0) || (Integer.parseInt(mI) > 59)) || ((Integer.parseInt(hF) < 0) || (Integer.parseInt(hF) > 23)) ||
+				((Integer.parseInt(mF) < 0) || (Integer.parseInt(mF) > 59)) || !horaCompleta.contains(":")) {				
+					
+					System.out.println("\n\nQual o horário de chegada do veículo?\n(Digite no Formato 'hora:minuto')\n");
+					horaCompleta = scanner.next();
+					
+					if (! horaCompleta.contains(":")) {
+						limparPrompt();
+						System.out.println("Insira o horário no formato correto: hora:minutos\nRetornando ao menu Princinpal...");
+						aplicarDelay(3000);
+						exibirMenuPrincipal(banco, bancoE);
+					}
+					else {
+						//Formatação da String:
+						String[] partes = horaCompleta.split(":");
+						String horaString = partes[0];  // Hora como string
+						String minutoString = partes[1];  // Minuto como string
+						
+						hI = horaString;  // Hora como int
+						mI = minutoString;  // Minuto como int
+
+						horaCompleta = "";
+					
+	
+						System.out.println("\n\nQual o horário de partida do verículo?\n(Digite no Formato 'hora:minuto')\n");
+						horaCompleta = scanner.next();
+						
+						if (! horaCompleta.contains(":")) {
+							limparPrompt();
+							System.out.println("Insira o horário no formato correto: hora:minutos\nRetornando ao menu Princinpal...");
+							aplicarDelay(3000);
+							exibirMenuPrincipal(banco, bancoE);
+						}
+						else {
+							//Formatação da String:
+							partes = horaCompleta.split(":");
+							horaString = partes[0];  // Hora como string
+							minutoString = partes[1];  // Minuto como string
+							
+							hF = horaString;  // Hora como int
+							mF = minutoString;  // Minuto como int
+
+
+					}
+					}	
+				}
+				
+				banco.get(resposta - 1).setAcessos(placa, hI, mI, hF, mF);
 				
 				if (banco.get(resposta - 1).getAcessos().size() == banco.get(resposta - 1).getCapacidade()) {
 					banco.get(resposta - 1).setSituacaoCapacidade(false);
@@ -615,10 +687,6 @@ public class main {
 				exibirMenuPrincipal(banco, bancoE);
 				
 			}
-		}
-		
-		public static void escolha4(List<Estacionamento> banco, List<AcessoEvento> bancoE) {
-
 		}
 
 		public static void escolhaListarEvento(List<Estacionamento> banco, List<AcessoEvento> bancoE) {
@@ -778,6 +846,7 @@ public class main {
 			for (AcessoEvento e: bancoE) {
 				if (e.getnomeEvento().equals(valorPesquisa)) {
 					limparPrompt();
+					System.out.println("==================================================\n\n\n");
 					System.out.println("Nome do Evento: " + e.getnomeEvento());
 					
 					System.out.println("\n\n PREÇO DE ENTRADA: R$" +  e.getvalor() + "\n\n\n==============="

@@ -15,7 +15,7 @@ public class Estacionamento {
 	private boolean situacaoCapacidade;
 	
 	
-	public Estacionamento(String n, String cap, double retorno, int hI, int mI, int hF, int mF) throws ValorAcessoInvalidoException, DescricaoEmBrancoException {
+	public Estacionamento(String n, String cap, double retorno, int hI, int mI, int hF, int mF, String vMens, String vFrac, String vDiurno, String THorCheia) throws ValorAcessoInvalidoException, DescricaoEmBrancoException {
 
 		if ((hI < 0) || (mI < 0) || (mF < 0) || (hF < 0)) {
 			throw new ValorAcessoInvalidoException("Hora ou Minuto Mínimo Requerido (Min: 00:00)");
@@ -26,8 +26,23 @@ public class Estacionamento {
 		else if (cap.isEmpty()) {
 			throw new DescricaoEmBrancoException("Capacidade em Branco");
 		}
-		else if (Integer.valueOf(cap) < 0) {
-			throw new ValorAcessoInvalidoException("Capacidade Negativa!");
+		else if (Double.valueOf(vMens) < 0) {
+			throw new ValorAcessoInvalidoException("Valor Mensalista Negativa!");
+		}
+		else if (vMens.isEmpty()) {
+			throw new DescricaoEmBrancoException("Valor Mensalista não informado!");
+		}
+		else if (Integer.valueOf(vFrac) < 0) {
+			throw new ValorAcessoInvalidoException("Valor por Fração Negativa!");
+		}
+		else if (vFrac.isEmpty()) {
+			throw new DescricaoEmBrancoException("Valor por Fração não informada!");
+		}
+		else if (Double.valueOf(vDiurno) < 0) {
+			throw new ValorAcessoInvalidoException("Valor Diurno Negativa!");
+		}
+		else if (vDiurno.isEmpty()) {
+			throw new ValorAcessoInvalidoException("Valor Diurna não informada!");
 		}
 		else {
 			acessos = new LinkedList<Acesso>();
@@ -37,6 +52,8 @@ public class Estacionamento {
 			this.nome = n;
 			this.situacaoCapacidade = true;
 			setHorarioFuncionamento(hI, mI, hF, mF);
+
+			valores = new ValorAcesso(vMens, vFrac, vDiurno, THorCheia);
 		}
 	}
 
@@ -110,10 +127,15 @@ public class Estacionamento {
 		return horarioFuncionamento;
 	}
 	
-	public void setAcessos(String placa) {
-		Acesso veiculo = new Acesso(placa);
+	public void setAcessos(String placa, String hI, String mI, String hF, String mF) {
 		
-		acessos.add(veiculo);
+		try {
+			Acesso veiculo = new Acesso(placa, hI, mI, hF, mF);
+			
+			acessos.add(veiculo);
+		} catch (DescricaoEmBrancoException e) {
+			System.out.println("\nOpa! Parece que há um erro nos dados que você inseriu! \n\n" + e.getMessage());
+		}
 	}
 	
 	public void removeAcessos(String placa) {
